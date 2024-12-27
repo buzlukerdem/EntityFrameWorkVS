@@ -58,9 +58,11 @@ EF Core veritabanı ile çalışmaları nesnel hale getirir.
 * Hazır veritabanını hızlıca modelleme imkanı sağlar.
 * Oracle - PostgreSQL - SQL Server vs. ef core desteklenen veritabanlarında kullanılabilirdir.
 
-
-
-
+##### 2. CODE FIRST APPROACH/YAKLAŞIM
+* Önceden oluşturulmamış veritabanınının kod kısmında modellenmesi ile veritabanı, veritabanı sunucusunda oluşturulmaktadır.
+* Migration ile gerçekleştirilmektedir.
+* Veritabanında herhangi bir değişiklik kontrol edilip güncelleme davranışına gerek duyulmamaktadır.
+* Oracle - PostgreSQL - SQL Server vs. ef core desteklenen veritabanlarında kullanılabilirdir.
 
 
 
