@@ -20,16 +20,48 @@
 *  Veritabanı – Veritabanı Tabloları - Veritabanı Tablo Verileri Nesneler ile eşleştirme davranışı sergiler.
 * Veritabanı ve SQL sorguları bağımlılığını soyutlamaktadır.
 * Veritabanını temsil edecek bir Context Class referans edeceği tablolara karşılık sınıfları içerisinde member olarak bulundurur.
+* Veritabanını temsil edecek sınıf DbContext olarak oluşturulmaktadır ve DbContext sınıfından sınıfından kalıtım almalıdır..
+##### DbContext
 ```CSharp
-DBContext context = new();
-// bir Context nesnesi uretildi.
-var employees = context.Employees.ToList();
+public class DatabaseNameDbContext : DbContext
+{
+// DbContextten türetildi...
+}
 ```
-Veriler object/instance olarak elde edilir.
+* Veritabanı nesnesi ile tablo nesneleri arasında nesnel ilişikiyi sağlamaktadır.
+* Sorgulamalar DbContext sınıfı üzerinden yürütülür.
+* Change Tracking ile sorgu verilerinde değişiklikler takip edilebilmektedir.
+* Caching operasyonlarını yönetebilmektedir.
 
-
-
-
+##### ENTITY
+* Veritabanındaki tabloları temsil edecek sınıftır.
+* Entity sınıfları, DbContext sınıfı içerisinde **DbSet<T.>** ile propety olarak bildirilmektedir.
+* Sorgulanabilir sınıflar olması için DbContext içerisinde tanımlanır.
+``` Csharp
+public class DatabaseNameDbContext : DbContext
+{
+    public DbSet<Entity1> Entity1s{get;set;}
+    public DbSet<Entity2> Entity2s{get;set;}
+    public DbSet<Entity3> Entity3s{get;set;}
+}
+```
+* Veritabanı Tablolarının Kolonları Entity sınıfı içerisinde property olarak tanımlanır.
+``` Csharp
+public class Entity1
+{
+    public int Entity1Id{get;set;}
+    public string Entity1Name{get;set;}
+}
+```
+* Veritabanındaki veriler Entity sınıfının instance/object/veri 'ına karşılık gelmektedir.
+``` Csharp
+// Veritabanı tablosunda satırdaki veriye karşılık gelen entity nesnesi...
+new Entity1()
+{
+ Entity1Id = 1,
+ Entity1Name = EName
+}
+```
 
 ORM tool'u: **Entity Framework Core**
 
