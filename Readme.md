@@ -118,19 +118,43 @@ Scaffold-DbContext'Connection String' Microsoft.EntityFrameworkCore.SqlServer -C
 ```
 Context ve Entity class'ları **PARTIAL** olarak oluşturulmaktadır.
 
+**Microsoft.EntityFrameworkCore.Tools** ve kullanılacak olan veritabanı hangisi ise ona uygun provider Nuget üzerinden yüklenmelidir.
+
+
 ##### 2. CODE FIRST APPROACH/YAKLAŞIM
 * Önceden oluşturulmamış veritabanınının kod kısmında modellenmesi ile veritabanı, veritabanı sunucusunda oluşturulmaktadır.
 * Migration ile gerçekleştirilmektedir.
 * Veritabanında herhangi bir değişiklik kontrol edilip güncelleme davranışına gerek duyulmamaktadır.
 * Oracle - PostgreSQL - SQL Server vs. ef core desteklenen veritabanlarında kullanılabilirdir.
 
+Kod kısmmında modellenen veritabanı ve tabloları **DbContext** sınıfında **migrate** edilerek veritabanında oluşturmaktadır.
 
+Migrate işleminden önce aktarılacak olan Veritabanı Tablolarına karşılık gelecek entity modelleri oluşturulmalıdır.
+Oluşturulan Entity Modelleri DbContext sınıfında DbSet ile tanımlanmalıdır.
+Kalıtımsal olarak gelen OnCofiguring metotu ile kullanılacak server optionsBuilder nesnesi ile ConnectionString bildirilir.
+ <img src="/images/sqloptions.png" alt="Alt Text" style="width:175%; height:auto;">
 
+**Microsoft.EntityFrameworkCore.Tools** ve kullanılacak olan veritabanı hangisi ise ona uygun provider Nuget üzerinden yüklenmelidir.
 
+**Migration Sınıfı Oluşturma Package Manager Console'da**
+```
+add-migration [MigrateName]
+```
+* Oluşan MigrateName adında Migration sınfından kalıtım alan sınıf Up ve Down metotları içermektedir.
+**Up**: Ekleme Operasyonu Yürütmektedir.
+**Down**: Geri Alma Operasyonu Yürütmektedir.
 
-
-
-
-
-
+Bu sınıf, veritabanına migrate ile gönderilmektedir.
+Up Fonksiyonu
+```
+update-database 
+```
+Down Fonksiyonu(Migrationa Geri Dönme)
+```
+update-database [MigName]
+```
+Migration Silme
+```
+remove-migration
+```
 
