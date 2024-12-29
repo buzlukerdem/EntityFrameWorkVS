@@ -82,6 +82,7 @@ nesnelerini üretip kullanma imkanı sağlamaktadır.
 
 EF Core veritabanı ile çalışmaları nesnel hale getirir.
 2 farklı yaklaşım sergilemektedir.
+
 **Veritabanının önceden var olup olmaması yaklaşımı etkilemektedir.**
 ##### 1. DATABASE FIRST APPROACH/YAKLAŞIM
 * Önceden oluşturulmuş bir veritabanı durumu var ise Database First yaklaşımı tercih edilmektedir.
@@ -89,6 +90,33 @@ EF Core veritabanı ile çalışmaları nesnel hale getirir.
 * Modelleme işlemi **Scaffold** talimati ile gerçekleştirilmektedir.
 * Hazır veritabanını hızlıca modelleme imkanı sağlar.
 * Oracle - PostgreSQL - SQL Server vs. ef core desteklenen veritabanlarında kullanılabilirdir.
+
+Kullanımı:
+* Scaffold talimatı ile veritabanının kod kısmında modellenmesi.
+Talimat;
+**Scaffold-DbContext 'Connection String' Microsoft.EntityFrameworkCore.[DBProvider]**
+* Connection String i elde etmek için link => [ConnectionStrings](https://www.connectionstrings.com/)
+* Database Provider kütüphanesi için link =>
+[DB-Providers](https://learn.microsoft.com/en-us/ef/core/providers/?tabs=dotnet-core-cli)
+
+Package Manager Console üzerinde Scaffold Talimatları;
+**1.Veritabanı'nın Modellenmesi**
+```
+Scaffold-DbContext'Connection String' Microsoft.EntityFrameworkCore.SqlServer
+```
+**2.Veritabanı değişikliğinde Model Güncelleme(Force)**
+```
+Scaffold-DbContext'Connection String' Microsoft.EntityFrameworkCore.SqlServer -Force
+```
+**3.Belirli Tablolar ile Modelleme(Tables)**
+```
+Scaffold-DbContext'Connection String' Microsoft.EntityFrameworkCore.SqlServer -Tables Table1, Table2, Table3
+```
+**4.Özel NameSpace ve Path ismi ile Modelleme(Contextdir,Outputdir)**
+```
+Scaffold-DbContext'Connection String' Microsoft.EntityFrameworkCore.SqlServer -ContextDir Contexts -OutputDir Entities
+```
+Context ve Entity class'ları **PARTIAL** olarak oluşturulmaktadır.
 
 ##### 2. CODE FIRST APPROACH/YAKLAŞIM
 * Önceden oluşturulmamış veritabanınının kod kısmında modellenmesi ile veritabanı, veritabanı sunucusunda oluşturulmaktadır.
