@@ -84,6 +84,7 @@ EF Core veritabanı ile çalışmaları nesnel hale getirir.
 2 farklı yaklaşım sergilemektedir.
 
 **Veritabanının önceden var olup olmaması yaklaşımı etkilemektedir.**
+
 ##### 1. DATABASE FIRST APPROACH/YAKLAŞIM
 * Önceden oluşturulmuş bir veritabanı durumu var ise Database First yaklaşımı tercih edilmektedir.
 * Veritabanını belirli tool'lar ile kod kısmında OOP eşliğinde modellenmektedir.
@@ -134,7 +135,7 @@ Oluşturulan Entity Modelleri DbContext sınıfında DbSet ile tanımlanmalıdı
 Kalıtımsal olarak gelen OnCofiguring metotu ile kullanılacak server optionsBuilder nesnesi ile ConnectionString bildirilir.
  <img src="/images/sqloptions.png" alt="Alt Text" style="width:175%; height:auto;">
 
-**Microsoft.EntityFrameworkCore.Tools** ve kullanılacak olan veritabanı hangisi ise ona uygun provider Nuget üzerinden yüklenmelidir.
+**Microsoft.EntityFrameworkCore.Tools** ve kullanılacak olan veritabanı hangisi ise ona uygun PROVIDER Nuget üzerinden yüklenmelidir.
 
 **Migration Sınıfı Oluşturma Package Manager Console'da**
 ```
@@ -145,16 +146,36 @@ add-migration [MigrateName]
 **Down**: Geri Alma Operasyonu Yürütmektedir.
 
 Bu sınıf, veritabanına migrate ile gönderilmektedir.
-Up Fonksiyonu
+<h5>Up Fonksiyonu</h5>
 ```
 update-database 
 ```
-Down Fonksiyonu(Migrationa Geri Dönme)
+<h5>Down Fonksiyonu(Migrationa Geri Dönme)</h5>
 ```
 update-database [MigName]
 ```
-Migration Silme
+<h5>Migration Silme</h5>
 ```
 remove-migration
 ```
 
+##### VERILERDE TEMEL DÜZEYDE İŞLEMLER
+* **1.EKLEME**
+Veritabanı context nesnesi üretilmesi gerekmekedir.
+Context üzerinden **AddAsync** metodu ile entity nesnesini ekleme işlemi gerçekleştirilir.
+Nesnenin Entry State'i Added durumundadır.Context nesnesi ile **SaveChangesAsync()** metodu ile veritabanının anlayacağı sorguyu oluşturur ve execute eder.
+Veritabanı arkada bir transaction işlemi yürütmektedir. Yapılacak her işlemden sonra SaveChanges metodunu tetiklemek maliyetli olacaktır. Yapılacak işlemler oluşturulduktan sonra SaveChanges metodunu tetiklemek daha doğru olacaktır.
+Sorgulama esnasında herhangi biri başarısız olursa **RollBack** ile tüm işlemler geri alınmaktadır.
+AddRange metodu ile birden çok veri ekleme işlemi gerçekleştirilebilmektedir.
+<br>
+
+* **2.GÜNCELLEME**
+Güncellenecek olan veriye öncelikle erişilmesi gerekmektedir. Erişim Entity'nin primary keyi yani Id'si üzerinden sağlanmaktadır.
+Elde edilen veri üzerinden yapılan güncellemelerden sonra SaveChanges ile veritabanına çalışacak sorgu gönderilip execute edilmektedir.
+**ChangeTracker** context üzerinden talep edilen nesnenin takibini sağlamaktadır.
+Yapılacak İşlemleri(Update-Delete) takip etmekte ve SaveChanges metoduna ile oluşturulacak sorguyu ayırt etmeyi sağlamaktadır.
+<br>
+
+* **3.SİLME**
+Id'ye göre elde edilen veri context nesnesinin Remove metotu ile deleted state olmaktadır ve SaveChanges ile veritabanına çalışacak sorgu gönderilip execute edilmektedir.
+**RemoveRange** ile birden fazla nesne silme işlemi gerçekleştirilebilmektedir.
