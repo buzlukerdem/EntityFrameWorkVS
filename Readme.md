@@ -147,19 +147,26 @@ add-migration [MigrateName]
 
 Bu sınıf, veritabanına migrate ile gönderilmektedir.
 <h5>Up Fonksiyonu</h5>
+
 ```
 update-database 
 ```
+
 <h5>Down Fonksiyonu(Migrationa Geri Dönme)</h5>
+
 ```
 update-database [MigName]
 ```
+
 <h5>Migration Silme</h5>
+
 ```
 remove-migration
 ```
 
-##### VERILERDE TEMEL DÜZEYDE İŞLEMLER
+
+##### VERILERDE İŞLEMLER
+
 * **1.EKLEME**
 Veritabanı context nesnesi üretilmesi gerekmekedir.
 Context üzerinden **AddAsync** metodu ile entity nesnesini ekleme işlemi gerçekleştirilir.
@@ -172,10 +179,43 @@ AddRange metodu ile birden çok veri ekleme işlemi gerçekleştirilebilmektedir
 * **2.GÜNCELLEME**
 Güncellenecek olan veriye öncelikle erişilmesi gerekmektedir. Erişim Entity'nin primary keyi yani Id'si üzerinden sağlanmaktadır.
 Elde edilen veri üzerinden yapılan güncellemelerden sonra SaveChanges ile veritabanına çalışacak sorgu gönderilip execute edilmektedir.
-**ChangeTracker** context üzerinden talep edilen nesnenin takibini sağlamaktadır.
+(<a href="#ChangeTracker">**ChangeTracker**</a>) context üzerinden talep edilen nesnenin takibini sağlamaktadır.
 Yapılacak İşlemleri(Update-Delete) takip etmekte ve SaveChanges metoduna ile oluşturulacak sorguyu ayırt etmeyi sağlamaktadır.
 <br>
 
 * **3.SİLME**
 Id'ye göre elde edilen veri context nesnesinin Remove metotu ile deleted state olmaktadır ve SaveChanges ile veritabanına çalışacak sorgu gönderilip execute edilmektedir.
 **RemoveRange** ile birden fazla nesne silme işlemi gerçekleştirilebilmektedir.
+<br>
+
+##### VERILERDE SORGULAMA
+Sorgulama durumları;
+* **IQueryable**: Oluşturulan sorgunun execute edilmemiş hali/sorgulama durumunu temsil eder.
+* **IEnumerable**: Sorgunun çalışıp execute edilmiş hali, sorgu neticesinde verilerin in memory'e yüklenme durumunu temsil eder.
+
+**Method Syntax** ile verileri elde ederken Context nesnesi üzerinden DbSet Entity'e karşılık Tablo adı .ToListAsync() metodu ile execute edilir.(IEnumerable Durumu.)
+```Csharp
+var values = await context.TableName.ToListAsync();
+```
+**QuerySyntax** ile veriler Linq sorgusu ile elde edilir ve .ToListAsync() metodu ile execute edilir.
+```Csharp
+var values = (from v in context.TableName
+              select v).ToListAsync();
+```
+
+**DEFERRED EXECUTION**
+Ertelenmiş çalışma anlamına gelmektedir. IQueryable durumunda olan sorgu yazıldığı noktada tetiklenmez. Execute edildiği noktada tetiklenir. Sorgulama içerisinde kullanılan değişkenler sonradan değişiklik gösterirse, sorgu çalışmadan önce değişkenlerin son halini ele almaktadır.
+* Example:
+ ```Csharp
+ int _id = 5;
+var values = from v in context.TableName
+             where v.Id == _id
+             select v;
+_id = 10;
+await values.ToListAsync();
+```
+
+
+
+<h3><a id="ChangeTracker">Change Tracker</a></br></h3>
+Change Tracker
