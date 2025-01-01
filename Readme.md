@@ -218,4 +218,41 @@ await values.ToListAsync();
 
 
 <h3><a id="ChangeTracker">Change Tracker</a></br></h3>
-Change Tracker
+Context nesnesinden gelen veriler/nesneler otomatik olarak Change Tracker mekanizması ile takip edilir.
+Veriler üzerinde yapılan işlemleri uygun SQL sorgu formatına generate eder.
+ChangeTracker propertysi: Takibi yapılan nesnelere erişebilmeyi ve işlemler yapabilmeyi sağlamaktadır.<br>
+<br>
+
+**Property**
+```csharp
+DbContext context = new();
+context.ChangeTracker;
+```
+
+**DetectChanges Method**
+Veriler üzerinde yapılan değişikliklerin ChangeTracker mekanızmasınının takip ettiğinden emin olmak için SaveChanges metodundan önce DetectChanges metodu ile manuel bir şekilde kullanılabilmektedir. SaveChanges özünde DetectChanges metodunu çağırmaktadır.
+
+**Entries Method**
+Takip eidlen nesnelerin bilgisini EntityEntry olarak elde etmeyi sağlamaktadır.
+EntityState e göre belirli işlemler/operasyonlar sağlayabilinmektedir.
+
+**AcceptAllChanges Method**
+SaveChanges() metodunun default parametresi true'dur. Tetiklendiğinde yapılan değişikliklerin doğru olduğunu kabul etmekte  ve nesnelerin takibini kesmektedir. Beklenmeyen bir olası hata durumunda nesnelerin takibini bıraktığı için düzeltme işlemleri gerçekleştirilemeyecektir.
+**SaveChanges(false)** başarılı veya başarısız takip etmeyi bırakmamaktadır. Bu yüzden değişiklik/onarım yapmaya olanak sağlamaktadır.
+AcceptAllChanges metodu değişikliklerin onaylandığı ve takibinin bırakılmasını sağlamaktadır.
+```csharp
+DbContext context = new();
+await context.SaveChangesAsync(false);
+/// Belirli Operasyonlar...
+context.ChangeTracker.AcceptAllChanges();
+```
+
+<h4>Entity States</h4>
+Entity nesnelerinin durumları;
+
+* Detached: Nesnenin takip edilmediğini ifade etmekdeir.
+* Added: Henüz veritabanına işlenmemiş verinin savechanges metodu ile insert sorgusu oluşturacağı anlamına gelmektedir.
+* Unchanged: Nesne üzerinde herhangi bir değişiklik olmadığını ifade etmektedir.
+* Modified: Nesne üzerinde değişiklik olduğunda update işlemi yapacağı anlamına gelmektedir.
+* Deleted: Nesne Remove metodu ile kaldırıldığında Delete işlemiyapacağı anlamına gelmektedir.
+
