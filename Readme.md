@@ -253,6 +253,45 @@ Entity nesnelerinin durumları;
 * Detached: Nesnenin takip edilmediğini ifade etmekdeir.
 * Added: Henüz veritabanına işlenmemiş verinin savechanges metodu ile insert sorgusu oluşturacağı anlamına gelmektedir.
 * Unchanged: Nesne üzerinde herhangi bir değişiklik olmadığını ifade etmektedir.
-* Modified: Nesne üzerinde değişiklik olduğunda update işlemi yapacağı anlamına gelmektedir.
+* Modified: Nesne üzerinde değişiklik olduğunda Update işlemi yapacağı anlamına gelmektedir.
 * Deleted: Nesne Remove metodu ile kaldırıldığında Delete işlemiyapacağı anlamına gelmektedir.
 
+SaveChanges metodu DbcContext sınıfında virtual ile işaretlenmiş ve override edilebilir bir yapıdadır. Override edilerek şartlara göre kullanım amacına göre yapılandırılabilmektedir.
+
+! ChangeTracker ile takip edilen veriler boyutuna göre belirli bir maliyete sebep olabilmektedir.
+Elde edilen tüm verilerin takibinin yapılması ve ayrıca veriler sadece listelenmeye tabi tutulacaksa gerekmeye gerekmeyebilmektedir.
+<h4>AsNoTracking</h4>
+ AsNoTracking metodu ile maliyet azaltılabilir ve 
+ elde edilen veriler üzerinde herhangi bir değişiklik(update) işlemi yapılamamaktadır.
+
+AsNoTracking metodu IQueryable durumundayken kullanılır ve daha sonra sorgu execute edilir.
+```csharp
+DbContext context = new();
+await context.TableName1.Include(tb1 => tb1.TableName2).AsNoTracking().ToListAsync();
+```
+İlişkisel verilerde maliyet olabilmektedir. ChangeTracker'da elde edilen veriler ilişkisel olduğu verilerde aynı değere sahip nesneler memoryde olacağı için tekrar tekrar üretilmemektedir.
+Ancak AsNoTracking metodunda bu durum her seferinde yeni nesne oluşturarak ilişkilendirir.
+
+<h4>AsNoTrackingWithIdendityResolution</h4>
+Hem takip mekanizması koparılır hem de yinelenen datalarda ChangeTrackor da olduğu gibi bir davranış sergilemek için AsNoTrackingWithIdentityResolution metodunu kullanabilmektedir.
+
+```csharp
+DbContext context = new();
+await context.TableName1.Include(tb1 => tb1.TableName2).AsNoTrackingWithIdentityResolution()ToListAsync();
+```
+
+<h4>UseQueryTrackingBehavior</h4>
+Context üzerinden gelen verilerin takibinde ChangeTracker mekanizmasının davranışını değiştirmemizi sağlayan konfigürasyon metodudur.
+OptionsBuilder ile bu metod kullanılabilmektedir.
+
+```csharp
+// Takip edilmemesine gore ayarlama...
+optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+```
+<h4>AsTracking</h4>
+Özünde ChangeTrackor mekanizması davranışı sergilemektedir. NoTracking durumunda değişiklik yapılarak nesnelerin takibi tekrar aktif edilebilmektedir.
+
+```csharp
+// Takip edilmemesine gore ayarlama...
+await context.TableName.AsTracking().ToListAsync();
+```
