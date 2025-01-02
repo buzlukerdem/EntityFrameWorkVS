@@ -295,3 +295,95 @@ optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 // Takip edilmemesine gore ayarlama...
 await context.TableName.AsTracking().ToListAsync();
 ```
+<br>
+
+##### İLİŞKİ YAPILANMASI
+**Principal Entity**
+Kendi başına var olan tabloyu modelleyen entity'dir.
+**Dependent Entity**
+Bir başka tabloya ilişkisel olarak bağımlı entity'dir.
+**Foreign Key**
+Principal Entity ile Dependent Entity arasındaki ilişkiyi sağlar. Dependent Entity içerisinde tanımlanır.
+**Principal Key**
+Principal Entity içerisinde tanımlanır.
+
+**Navigation Property**
+İlişkisel tablolar arasındaki fiziksel erişimi class içerisinde Navigation propertyleri sağlamaktadır.
+
+</br>
+
+<h4>Birebir İlişki Türü</h4>
+Entity sınıflarında ilişkisel türde olacak veriler Navigation Propertyler ile sağlanmaktadır.
+<br></br>
+
+**Araç Ve Plaka Örneği;**
+```csharp
+//Principal Entity
+class Arac
+{
+    public int AracId { get; set; }
+    public string AracModel { get; set; }
+    //Navigator Property
+    public AracPlaka AracPlaka { get; set; }
+}
+
+// Dependent Entity
+class AracPlaka
+{
+    public int AracPlakaId { get; set; }
+    public string AracPlakaNumarası { get; set; }
+    //Navigator Property
+    public Arac Arac { get; set; }
+}
+```
+<br>
+
+**Default Convention** olarak kullanımında bağımlı olacak entityi Foreign Key karşılık property tanımlanarak belirtilebilmektedir.
+Migrate neticesinde AracPlaka entitysi içerisinde tanımlanmış AracId foreign key olarak oluştulmakta ve Arac entitysinin AracId kolonuyla eşleştirilmektedir.
+
+```csharp
+// Dependent Entity
+class AracPlaka
+{
+    public int AracPlakaId { get; set; }
+    //ForeignKey
+    public int AracId { get; set; }
+    public string AracPlakaNumarası { get; set; }
+    //Navigator Property
+    public Arac Arac { get; set; }
+}
+```
+<br>
+
+**Data Annotations;**
+Data Annotations ile Foreign Key e karşılık gelecek property ismini değiştirebilmekte ve Dependent Entity Id'sini hem Primary Key hemde Foreign Key olarak ForeignKey Attribute'u ile tanımlanabilmektedir.
+
+```csharp
+// Dependent Entity
+class AracPlaka
+{
+    [Key, ForeignKey(nameof(Arac))]
+    public int AracPlakaId { get; set; }
+    public string AracPlakaNumarası { get; set; }
+    //Navigator Property
+    public Arac Arac { get; set; }
+}
+```
+<br>
+
+**Fluent Api**
+Fluent Api Context sınıfı içerisinde OnModelCreating Metodunun override edilmesi ile kullabilmektedir. 
+```csharp
+protected override void OnModelCreating(ModelBuilder modelBuilder)
+{
+    modelBuilder.Entity<AracPlaka>()
+        .HasKey(a => a.AracPlakaId);
+
+    modelBuilder.Entity<Arac>()
+        .HasOne(a => a.AracPlaka)
+        .WithOne(ap => ap.Arac)
+        .HasForeignKey<AracPlaka>(ap => ap.AracPlakaId);
+}
+```
+
+
