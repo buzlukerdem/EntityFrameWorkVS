@@ -331,7 +331,7 @@ class Arac
 class AracPlaka
 {
     public int AracPlakaId { get; set; }
-    public string AracPlakaNumarası { get; set; }
+    public string AracPlakaNumarasi{ get; set; }
     //Navigator Property
     public Arac Arac { get; set; }
 }
@@ -348,7 +348,7 @@ class AracPlaka
     public int AracPlakaId { get; set; }
     //ForeignKey
     public int AracId { get; set; }
-    public string AracPlakaNumarası { get; set; }
+    public string AracPlakaNumarasi { get; set; }
     //Navigator Property
     public Arac Arac { get; set; }
 }
@@ -364,7 +364,7 @@ class AracPlaka
 {
     [Key, ForeignKey(nameof(Arac))]
     public int AracPlakaId { get; set; }
-    public string AracPlakaNumarası { get; set; }
+    public string AracPlakaNumarasi { get; set; }
     //Navigator Property
     public Arac Arac { get; set; }
 }
@@ -383,6 +383,34 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
         .HasOne(a => a.AracPlaka)
         .WithOne(ap => ap.Arac)
         .HasForeignKey<AracPlaka>(ap => ap.AracPlakaId);
+}
+```
+
+
+<h4>Bireçok İlişki Türü</h4>
+Bireçok ilişki durumunda foreign key tanımlamaya gerek duyulmamaktadır.
+Navigation Propertyler ile ilişki sağlanmaktadır.
+Default olarak arka planda KitapEntity içerisinde YazarId'ye karşılık kolon oluşturmaktadır.
+<br></br>
+
+**Ürün Ve Marka Örneği;**
+```csharp
+//Dependent Entity
+class Urun
+{
+    public int UrunId { get; set; }
+    public string UrunAdi { get; set; }
+    //Navigator Property
+    public Marka Marka { get; set; }
+}
+
+// Principal Entity
+class Marka
+{
+    public int MarkaId { get; set; }
+    public string MarkaAdi { get; set; }
+    //Navigator Property
+    public ICollection<Urun> Urunler { get; set; }
 }
 ```
 
