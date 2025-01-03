@@ -372,7 +372,7 @@ class AracPlaka
 <br>
 
 **Fluent Api**
-Fluent Api Context sınıfı içerisinde OnModelCreating Metodunun override edilmesi ile kullabilmektedir. 
+Fluent Api Context sınıfı içerisinde OnModelCreating Metodunun override edilmesi ile konfigürasyonel olarak kullabilmektedir. 
 ```csharp
 protected override void OnModelCreating(ModelBuilder modelBuilder)
 {
@@ -414,4 +414,126 @@ class Marka
 }
 ```
 
+<h4>Çoka Çok İlişki Türü</h4>
+İki entity arasında ilişkinin sağlanması için navigation propertyler üzerinden bir CrossTable gerekmektedir.
+EF Core CrossTable entitysini kendisi oluşturmaktadır.
+KitapYazar veya YazarKitap olarak bir entity tanımlayacak ve composite olarak Primary Key tanımlayacaktır.
+
+**Kitap Ve Yazar Örneği;**
+```csharp
+class Kitap
+{
+    public int KitapId { get; set; }
+    public string KitapAdi { get; set; }
+    //Navigator Property
+    public ICollection<Yazar> Yazarlar { get; set; }
+}
+
+class Yazar
+{
+    public int YazarId { get; set; }
+    public string YazarAdi { get; set; }
+    //Navigator Property
+    public ICollection<Kitap> Kitaplar { get; set; }
+}
+```
+<br>
+
+##### İLİŞKİSEL VERILERDE İŞLEMLER
+
+<h5>1.VERİ EKLEME</h5>
+1-1 ilişkiye sahip Entityler üzerinden veri ekleme işleminde Principal Entity ile Nesne üretip ekleme yaparken ilişkili olduğu Entityden nesne üretilmesi zorunlu değildir.
+Ancak tersine durumda iki entity içinde nesne üretimi gerekmektedir.
+<br>
+
+Kullanım;
+```csharp
+DependentEntity de = new()
+{
+    De = "De",
+    PrincipalEntity = new()
+    {
+        Pe = "Pe"
+    };
+}
+
+class PrincipalEntity
+{
+    public int Id { get; set; }
+    public string Pe { get; set; }
+    public DependentEntity DependentEntity{ get; set; }
+}
+
+class DependentEntity
+{
+    public int Id { get; set; }
+    public string De { get; set; }
+    public PrincipalEntity PrincipalEntity{ get; set; }
+}
+```
+<br>
+1-N ilişkiye sahip Entityler arasındaki yapılanmada Principal Entity'nin constructor() sınıfında HashSet<T> koleksiyonu ile nesne oluşturulmakta ve bu nesne Navigation Property'e verilmektedir. Nesne üretilirken koleksiyonun null referans exception hatası vermemesi için verilmektedir.
+<br>
+
+Kullanım;
+```csharp
+class PrincipalEntity
+{
+    public PrincipalEntity()
+    {
+        DependentEntities = new HashSet<DependentEntity>();
+    }
+    public int Id { get; set; }
+    public string Pe { get; set; }
+    public ICollection<DependentEntity> DependentEntities{ get; set; }
+}
+
+class DependentEntity
+{
+    public int Id { get; set; }
+    public string De { get; set; }
+    public PrincipalEntity PrincipalEntity{ get; set; }
+}
+```
+<br>
+
+N-N ilişkiye sahip Entityler üzerinden veri eklemede hem CrossTable Entitysi oluşturulup hemde oluşturulmadan kullanılabilmektedir.
+Oluşturup kullanıldığında class nesnesine erişebilmeyi ve erişip manevratik işlemler yapabilmeyi sağlamaktadır.
+
+CrossTable ile kullanım;
+
+```csharp
+class PrincipalEntity
+{
+    public PrincipalEntity()
+    {
+        DependentEntities = new HashSet<DependentEntity>();
+    }
+    public int Id { get; set; }
+    public string Pe { get; set; }
+    public ICollection<PrincipalDepdendent> DependentEntities{ get; set; }
+}
+
+class PrincipalDepdendent
+{
+    public int PrincipalEntityId { get; set; }
+    public int DependentEntityId { get; set; }
+    public PrincipalEntity PrincipalEntity { get; set; }
+    public DependentEntity DependentEntity { get; set; }
+}
+
+class DependentEntity
+{
+    public DependentEntity()
+    {
+        PrincipalEntities = new HashSet<PrincipalDepdendent>();
+    }
+    public int Id { get; set; }
+    public string De { get; set; }
+    public ICollection<PrincipalDepdendent> PrincipalEntities{ get; set; }
+}
+```
+<br>
+OnModelCreating de FLUENTAPI olarak konfigürasyonel ayarlama.
+ <img src="/images/onModelCreatingNN.png" alt="Alt Text" style="width:95%; height:auto;">
 
