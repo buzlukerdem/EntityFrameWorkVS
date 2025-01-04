@@ -439,23 +439,14 @@ class Yazar
 ```
 <br>
 
-##### İLİŞKİSEL VERILERDE İŞLEMLER
+##### İLİŞKİSEL VERILERDE TANIMLAMALAR
 
-<h5>1.VERİ EKLEME</h5>
-1-1 ilişkiye sahip Entityler üzerinden veri ekleme işleminde Principal Entity ile Nesne üretip ekleme yaparken ilişkili olduğu Entityden nesne üretilmesi zorunlu değildir.
-Ancak tersine durumda iki entity içinde nesne üretimi gerekmektedir.
+
+1-1 ilişkiye sahip Entityler 
 <br>
 
 Kullanım;
 ```csharp
-DependentEntity de = new()
-{
-    De = "De",
-    PrincipalEntity = new()
-    {
-        Pe = "Pe"
-    };
-}
 
 class PrincipalEntity
 {
@@ -534,6 +525,19 @@ class DependentEntity
 }
 ```
 <br>
-OnModelCreating de FLUENTAPI olarak konfigürasyonel ayarlama.
- <img src="/images/onModelCreatingNN.png" alt="Alt Text" style="width:95%; height:auto;">
+
+İlişkisel tablolarda silme işlemi durumunda;
+3 Farklı davranış uygulanabilmektedir.
+
+* **1- Cascade**
+Principal Entity tablosundan silinen veriyle Denepdent Entity bağımlı tablosunda bulunan ilişkili verilerin silinmesini sağlar.
+
+* **2- SetNull**
+Principal Entity tablosundan silinen veriyle bağımlı tablodaki ilişkisel verilere NULL değerin atanmasını sağlar.
+1-1 ilişki durumunda setnull kullanılmamaktadır. Primary KEY null olamayacağı için...
+
+* **3- Restrict**
+Principal Entity tablosundan bir veri silinmeye çalışıldığında o veriye karşılık bağımlı tablodaki verilerin silinme işlemini engeller.
+
+
 
