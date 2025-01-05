@@ -20,7 +20,7 @@
 *  Veritabanı – Veritabanı Tabloları - Veritabanı Tablo Verileri Nesneler ile eşleştirme davranışı sergiler.
 * Veritabanı ve SQL sorguları bağımlılığını soyutlamaktadır.
 * Veritabanını temsil edecek bir Context Class referans edeceği tablolara karşılık sınıfları içerisinde member olarak bulundurur.
-* Veritabanını temsil edecek sınıf DbContext olarak oluşturulmaktadır ve DbContext sınıfından sınıfından kalıtım almalıdır..
+* Veritabanını temsil edecek sınıf DbContext olarak oluşturulmaktadır ve **DbContext** sınıfından sınıfından kalıtım almalıdır..
 ##### DbContext
 ```CSharp
 public class DatabaseNameDbContext : DbContext
@@ -524,7 +524,7 @@ class DependentEntity
     public ICollection<PrincipalDepdendent> PrincipalEntities{ get; set; }
 }
 ```
-<br>
+<br><br>
 
 İlişkisel tablolarda silme işlemi durumunda;
 3 Farklı davranış uygulanabilmektedir.
@@ -538,6 +538,49 @@ Principal Entity tablosundan silinen veriyle bağımlı tablodaki ilişkisel ver
 
 * **3- Restrict**
 Principal Entity tablosundan bir veri silinmeye çalışıldığında o veriye karşılık bağımlı tablodaki verilerin silinme işlemini engeller.
+<br>
+
+<h4>Backing Fields</h4>
+Entity içerisinde tanımlanan propertyler yerine field'ların kullanımlasını sağlar.
+Bu davranış ile field üzerinedn bir kapsulleme işlemi sağlanabilir.<br>
+<br>
+
+Kullanım;
+```csharp
+class Entity
+{
+    public int Id { get; set; }
+    public string name;
+    public string Name { get => name; set=> name = value; }
+}
+```
+<br>
+
+Verilerin sadece field üzerinden kullanılması için **BackingField Attribute** ile tanımlana yapılabilir.
 
 
+```csharp
+class Entity
+{
+    public int Id { get; set; }
+    public string name;
+    [BackingField(nameof(name))]
+    public string Name { get; set; }
+}
+```
+<br>
 
+Fluent api ile de backing field bildirimi gerçekleştirilebilir. **HasField()** metodu ile field bildirimi sağlanır.
+
+```csharp
+modelBuilder.Entity<EntityName>()
+    .Property(en => en.Name)
+    .HasField(nameof(EntityName.name));
+```
+<br>
+
+##### Field Only Properties
+Entitylerde gelecek olan değerlerin property yerine metotlar ile karşılanması veya belirli propertylerin gerektiği durumlarda gösterilmemesi için kullanılabilir.
+
+
+<h4>Shadow Property</h4>
