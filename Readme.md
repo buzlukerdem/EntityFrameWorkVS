@@ -584,3 +584,26 @@ Entitylerde gelecek olan değerlerin property yerine metotlar ile karşılanmas�
 
 
 <h4>Shadow Property</h4>
+Fiziksel olarak entity sınıfları içerisinde tanımlanmayan, entity instance'ında bulunmayacak ancak arka planda oluşturulan propertylerdir. Entity içerisinde tanımlanmayan ilişkiyi sağlayacak foreign key propertysi arka planda oluşturulmaktadır.<br>
+<br>
+
+Fluent API da Shadow Property oluşturma;
+```csharp
+modelBuilder.Entity<EntityName>()
+    .Property<PropertyType>("MyShadowProperty");
+```
+<br>
+
+Change Tracker ile Shadow Property'ye erişim;
+```csharp
+// Entry metodu ile propertyname i verilerek erişim
+context.Entry(EntityName).Property("MyShadowProperty");
+```
+<br>
+
+EF.Property Static yapısı ile Shadow Property'ye erişim;
+```csharp
+// LINQ sorgularında erişim.
+context.EntityName.OrderBy(e => EF.Property<PropertyType>(e, "MyShadowProperty"));
+```
+<br>
