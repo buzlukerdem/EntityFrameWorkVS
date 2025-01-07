@@ -831,3 +831,116 @@ modelBuilder.Entity<Employee>()
         .HasComment("Kolon açıklama...")
 ```
 <br>
+
+
+* **CompositeKey**
+Birden fazla kolonu HasKey methodu ile primary key olarak tanımlanmasını sağlar.
+
+```csharp
+modelBuilder.Entity<Employee>()
+        .HasKey(e => new {e.Id, e.Id2});
+
+```
+<br>
+
+* **HasDefaultSchema**
+Veritabanındaki default schema yapılandırılabilir.
+
+```csharp
+modelBuilder.HasDefaultSchema("t");
+
+```
+<br>
+
+* **HasDefaultValue**
+Tabloda bir kolon a değer gönderilmediği durumda default olarak değer atama.
+
+```csharp
+modelBuilder.Entity<Employee>()
+        .Propety(e => e.Name)
+        .HasDefaultValue("")
+```
+<br>
+
+* **HasDefaultValueSql**
+Tabloda bir kolon a değer gönderilmediği durumda bir sql komutundan default olarak değer alır.
+
+```csharp
+modelBuilder.Entity<Employee>()
+        .Propety(e => e.Date)
+        .HasDefaultValueSql("GETDATE()");
+```
+<br>
+
+* **HasComputedColumnSql**
+Tablolarda birden fazla kolon arasında verilere işlem uygulayarak ayrı kolonda tutulmasını sağlar.
+
+```csharp
+class Test
+{
+    public int ValueA { get; set; }
+    public int ValueB { get; set; }
+    public int ComputedValue { get; set; }
+}
+
+modelBuilder.Entity<Employee>()
+        .Propety(t => t.ComputedValue)
+        .HasComputedColumnySql("[ValueA] * [ValueB]");
+```
+<br>
+
+* **HasConstraintName**
+Bağımlı entity içerisinde tanımlanan foreign key'e constraint uygulayarak name'i değiştirilebilir.
+
+```csharp
+modelBuilder.Entity<Employee>()
+        .HasOne(e => e.Department)
+        .WithMany(d => d.Employee)
+        .HasForeignKey(e => e.DepartmentId)
+        .HasConstraintName("Department");
+```
+<br>
+
+* **HasData**
+Migration yapılanmasında veritabanına hazır veriler(**SeedData**) gönderilmesi istenirse HasData method u kullanılabilir.
+! Manuel olarak entity nesnelerinin id değerleri girilmelidir.
+
+```csharp
+modelBuilder.Entity<Employee>()
+        .HasData(new Employee
+        {
+            Id = 1,
+            Name = "E1",
+            Surname = "E2"
+        });
+```
+<br>
+
+* **HasField**
+Verilerin sadece field üzerinden kullanılması için **BackingField** ile tanımlana yapılabilir.
+
+```csharp
+modelBuilder.Entity<Employee>()
+    .Property(e => e.Name)
+    .HasField(nameof(Employee.name));
+```
+<br>
+
+* **HasField**
+Entityde bir primary key kolonu olmayacaksa bunun yapılandırılması gerekir.
+
+```csharp
+modelBuilder.Entity<Employee>()
+        .HasNoKey();
+```
+<br>
+
+* **HasQueryFilter**
+Bir entitye karşılık olarak uygulama bazında global bir Query Filter tanımlamaktır.
+Elde edilecek veriler tanımlanan sorgu ile default gelecektir.
+
+```csharp
+modelBuilder.Entity<Employee>()
+        .HasQueryFilter(e => e.Active == true);
+```
+<br>
