@@ -607,3 +607,227 @@ EF.Property Static yapısı ile Shadow Property'ye erişim;
 context.EntityName.OrderBy(e => EF.Property<PropertyType>(e, "MyShadowProperty"));
 ```
 <br>
+
+##### ENTITY CONFIGURATIONS
+Uygulamada EF-CORE ile default çalışan yapıların davranışları özelleştirilebilir.
+Konfigürasyonel ayarlar Context sınıfındaki OnModelCreating metodunda gerçekleştirilebilir.
+<br>
+
+* **Table Attribute**
+Tablo isimleri default olarak DBSet property isimlerinden alınır. Table attribute u ile yapılandırılabilir.
+
+```csharp
+[Table("Kisiler")]
+class Employee{}
+```
+<br>
+
+* **ToTable Method**
+Fluent API da modelBuilder ile de yapılandırma gerçekleştirilebilir.
+
+```csharp
+modelBuilder.Entity<Employee>()
+        .ToTable("Kisiler");
+```
+<br>
+
+* **Column Attribute**
+Tabloların kolonları entity sınıflarında propertylere karşılık gelmekte ve default olarak kolon adları, tipleri property isimlerinden ve tiplerinden alınır.
+
+```csharp
+class Employee
+{
+    [Column("Isim", TypeName = "")]
+    public string Name [ get; set; ]
+}
+```
+<br>
+
+* **Column Methods**
+Fluent API da modelBuilder ile Property üzerinden yapılandırma gerçekleştirilebilir.
+
+```csharp
+modelBuilder.Entity<Employee>()
+        .Property(e => e.Name)
+        .HasColumnName("Isim")
+        .HasColumnType("");
+```
+<br>
+
+* **ForeignKey Attribute**
+İlişkisel tablolarda esas tablodaki verilerin tutulacağı kolon bağımlı entity içerisinde foreign key olarak tanımlanmakta.
+Tanımlanma olmadığında EF-CORE default olarak shadow propety davranışı sergiler.
+
+```csharp
+class Employee
+{
+    [ForeignKey(nameOf(Department))]
+    public int DepartmentId [ get; set; ]
+    public Department Department { get; set; }
+}
+```
+<br>
+
+* **HasForeignKey Method**
+ModelBuilder da öncelikle ilişki türü yapılandırılmalı sonra foreignkey tanımlanmalıdır.
+
+```csharp
+modelBuilder.Entity<Employee>()
+        .HasOne(e => e.Department)
+        .WithMany(d => d.Employee)
+        .HasForeignKey(e => e.DepartmentId);
+```
+<br>
+
+* **NotMapped Attribute**
+Entity içerisindeki propertlyerin tümü default olarak tablo kolonlarına modellenir.
+Bazı durumlarda kolona modellenmemesi gereken bir property olduğu zaman NotMapped attribute'u ile işaretlenebilir.
+
+```csharp
+class Employee
+{
+    public int Id { get; set; }
+    [NotMapped]
+    public string MyPropety { get; set; }
+}
+```
+<br>
+
+* **Ignore Method**
+Fluent API'da modelBuilder üzerinden ignore metodu ile de aynı işlem gerçekleştirilebilir.
+
+```csharp
+modelBuilder.Entity<Employee>()
+        .Ignore(e => e.MyPropety);
+```
+<br>
+
+* **Key Attribute**
+EF-CORE default olarak id, EntityId, ID, EntityID propertyName'lerini PK olarak algılar ve constraint uygular.
+Key attribute u ile istenilen property'e primary key tanımlanabilir.
+
+```csharp
+class Employee
+{
+    [Key]
+    public int EmployeeNo { get; set; }
+}
+```
+<br>
+
+* **HasKey Method**
+Fluent API'da aynı işlem gerçekleştirilebilir.
+
+```csharp
+modelBuilder.Entity<Employee>()
+        .HasKey(e=> e.EmployeeNo);
+```
+<br>
+
+* **Required Attribute**
+Bir kolonun nullable olmayacağını belirtir.
+EF-CORE Default olarak not null davranışı sergiler. ? operatörü ile nullable davranış sergilenebilir.
+
+```csharp
+class Employee
+{
+    [Required]
+    public string Email { get; set; }
+}
+```
+<br>
+
+
+* **IsRequired Method**
+Fluent API'da aynı işlem gerçekleştirilebilir.
+
+```csharp
+modelBuilder.Entity<Employee>()
+        .Property(e => e.Email).isRequired();
+```
+<br>
+
+* **Length Attributes**
+Entity Propertylerinde sınırlama getirilebilmektedir.
+
+```csharp
+class Employee
+{
+    [MaxLength(20)]
+    public string Name { get; set; }
+    [StringLength(20)]
+    public string Surname { get; set; }
+}
+```
+<br>
+
+* **HasMaxLength Method**
+modelBuilder da aynı işlem gerçekleştirilebilir.
+
+```csharp
+modelBuilder.Entity<Employee>()
+        .Property(e => e.Name).HasMaxLength(20);
+```
+<br>
+
+* **Precision Attribute**
+Küsüratlı sayılarda belirli bir hane belirtmek istenildiğinde kullanılabilmektedir.
+
+```csharp
+class Employee
+{
+    [Presicion(5,3)]
+    public decimal Salary { get; set; }
+}
+```
+<br>
+
+
+* **HasPrecision Method**
+```csharp
+modelBuilder.Entity<Employee>()
+        .Property(e => e.Salary).HasPrecision(5,3);
+```
+<br>
+
+* **Unicode Attribute**
+Kolon içerisinde unicode karakterler kullanılacaksa bu yapılandırma uygulanır.
+
+```csharp
+class Employee
+{
+    [Unicode]
+    public string Address { get; set; }
+}
+```
+<br>
+
+* **IsUnicode Method**
+
+```csharp
+modelBuilder.Entity<Employee>()
+        .Property(e => e.Address).IsUniCode();
+```
+<br>
+
+* **Comment Attribute**
+Veritabanı nesneleri üzerinde bir açıklama eklemek için Comment kullanılabilir.
+
+```csharp
+class Employee
+{
+    [Comment("Açıklama..")]
+    public string MyP { get; set; }
+}
+```
+<br>
+
+* **HasComment Method**
+
+```csharp
+modelBuilder.Entity<Employee>()
+        .HasComment("Tablo Açıklama...");
+        .Property(e => e.MyP)
+        .HasComment("Kolon açıklama...")
+```
+<br>
