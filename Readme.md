@@ -944,3 +944,39 @@ modelBuilder.Entity<Employee>()
         .HasQueryFilter(e => e.Active == true);
 ```
 <br>
+
+
+**IEntityTypeConfiguration**
+Entity'lerde yapılacak olan konfigürasyonları o entity'e özel olarak ayrı bir dosyada yapmayı sağlayan bir arayüzdür.
+Merkezi bir yapılandırma noktası sağlar.
+Entity konfigürasyonlarının yönetilebilirliğini-okunabilirliğini sağlayacaktır.
+
+Entity konfigürasyonları yapılacak class **IEntityTypeConfiguration<*T>** arayüzünden implement edilir.
+**EntityTypeBuilder** ile gelen builder parametresi üzerinden konfigürasyonel çalışmalar yapılabilmektedir.
+
+```csharp
+class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
+{
+    public void Configure(EntityTypeBuilder<Employee> builder)
+    {
+        builder.Property();,
+        builder.Haskey();
+        //...
+    }
+}
+```
+<br>
+
+Konfigürasyonel sınıflar Context sınıfı içerisindeki OnModelCreating de **ApplyConfiguration** metotu ile bildirilir.
+
+```csharp
+modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
+```
+<br>
+
+**ApplyConfigurationsFromAssembly** metotu ile tek tek bildirmek yerine bulunduğu Assembly seviyesinde bildirilerek tek seferlik işlemde gerçekleştirilebilir.
+
+```csharp
+modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+```
+<br>
