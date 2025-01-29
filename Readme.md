@@ -132,7 +132,7 @@ Kod kısmmında modellenen veritabanı ve tabloları **DbContext** sınıfında 
 
 Migrate işleminden önce aktarılacak olan Veritabanı Tablolarına karşılık gelecek entity modelleri oluşturulmalıdır.
 Oluşturulan Entity Modelleri DbContext sınıfında DbSet ile tanımlanmalıdır.
-Kalıtımsal olarak gelen OnCofiguring metotu ile kullanılacak server optionsBuilder nesnesi ile ConnectionString bildirilir.
+Kalıtımsal olarak gelen OnCofiguring metodu ile kullanılacak server optionsBuilder nesnesi ile ConnectionString bildirilir.
  <img src="/images/sqloptions.png" alt="Alt Text" style="width:175%; height:auto;">
 
 **Microsoft.EntityFrameworkCore.Tools** ve kullanılacak olan veritabanı hangisi ise ona uygun PROVIDER Nuget üzerinden yüklenmelidir.
@@ -184,7 +184,7 @@ Yapılacak İşlemleri(Update-Delete) takip etmekte ve SaveChanges metoduna ile 
 <br>
 
 * **3.SİLME**
-Id'ye göre elde edilen veri context nesnesinin Remove metotu ile deleted state olmaktadır ve SaveChanges ile veritabanına çalışacak sorgu gönderilip execute edilmektedir.
+Id'ye göre elde edilen veri context nesnesinin Remove metodu ile deleted state olmaktadır ve SaveChanges ile veritabanına çalışacak sorgu gönderilip execute edilmektedir.
 **RemoveRange** ile birden fazla nesne silme işlemi gerçekleştirilebilmektedir.
 <br>
 
@@ -967,16 +967,46 @@ class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
 ```
 <br>
 
-Konfigürasyonel sınıflar Context sınıfı içerisindeki OnModelCreating de **ApplyConfiguration** metotu ile bildirilir.
+Konfigürasyonel sınıflar Context sınıfı içerisindeki OnModelCreating de **ApplyConfiguration** metodu ile bildirilir.
 
 ```csharp
 modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
 ```
 <br>
 
-**ApplyConfigurationsFromAssembly** metotu ile tek tek bildirmek yerine bulunduğu Assembly seviyesinde bildirilerek tek seferlik işlemde gerçekleştirilebilir.
+**ApplyConfigurationsFromAssembly** metodu ile tek tek bildirmek yerine bulunduğu Assembly seviyesinde bildirilerek tek seferlik işlemde gerçekleştirilebilir.
 
 ```csharp
 modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 ```
 <br>
+<br>
+
+
+<h3>SEED DATA</h3>
+
+EF Core ile migrate edilecek veritabanı için hazır veriler oluşturmayı sağlar.
+Migration işleminde bu veriler hedef tablolarına gönderilirler.
+<br>
+
+* Test için geçici verilere ihtiyaç için kullanılabilir.
+* Yazılım için temel konfigürasyonel değerler varsa kullanılabilir.
+
+Seed Datalar, OnModelCreating metodu içerisinde HasData fonksiyonu ile eklenir.
+Primary Key değerleri manuel olarak eklemek zorunludur.
+
+Örnek kullanım;
+
+```csharp
+modelBuilder.Entity<Employee>()
+    .HasData(
+        new Employee(){
+            Id = 1, 
+            Name = "Employee1"
+        },
+         new Employee(){
+            Id = 2, 
+            Name = "Employee2"
+        }
+    );
+```
