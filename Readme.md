@@ -1017,20 +1017,22 @@ modelBuilder.Entity<Employee>()
 
 Kalıtımsal hiyerarşideki tüm entityler için TPH davranışı ile tek bir tablo oluşturulur ve bu tablodaki entity kolonları **DISCRIMINATOR** kolonu ile ayırt edilir.
 
+EF Core default olarak TPH davranışı sergiler.
+
 Kalıtımsal durum;
 ```csharp
-public class Person
+abstract class Person
 {
     public int Id { get; set; }
     public string? Name { get; set; }
     public string? Surname { get; set; }
 }
-public class Employee : Person
+class Employee : Person
 {
     public string? Department { get; set; }
 }
 
-public class Customer : Person
+class Customer : Person
 {
     public string? Address { get; set; }
 }
@@ -1043,9 +1045,9 @@ Discriminator kolonu modelbuilder'da HasDiscriminator ve HasValue fonksiyonları
 
 Discriminator özelleştirme;
 ```csharp
-modelBuilder.Entity<Employee>()
+modelBuilder.Entity<Person>()
     .HasDiscriminator<string>("MyDisc")
-    .HasValue<Person>('P')
+    .HasValue<Customer>('C')
     .HasValue<Employee>('E');
 ```
 <br>
@@ -1066,11 +1068,30 @@ Bu tablolar arasında 1-1 bir ilişki vardır.
 Modelbuilder ile ToTable fonksiyonu kullanılarak TPT davranışı sergilenebilmektedir.
 
 ```csharp
-modelBuilder.Entity<Employee>()
-    .ToTable("Employees");
 modelBuilder.Entity<Person>()
     .ToTable("Persons");
+modelBuilder.Entity<Employee>()
+    .ToTable("Employees");
+modelBuilder.Entity<Customer>()
+    .ToTable("Customers");
 ```
 <br>
 
 TPH ye göre daha yavaşdır.
+
+<br><br>
+
+<h3>TABLE PER CONCRETE PATTERN </h3>
+
+Entitylerin aralarında kalıtımsal ilişkiye sahip durumlarda sadece concrete entitylerin tabloları oluşturulur.
+
+TPT ye göre daha performanslıdır.
+1-1 ilişki yoktur.
+Modelbuilder daki UseTpcMappingStrategy fonksiyonu ile kullanılır.
+
+Kullanım;
+
+```csharp
+modelBuilder.Entity<Person>()
+    .UseTpcMappingStrategy();
+```
