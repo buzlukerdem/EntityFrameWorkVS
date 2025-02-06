@@ -1010,3 +1010,26 @@ modelBuilder.Entity<Employee>()
         }
     );
 ```
+
+<br><br>
+
+<h3>TABLE PER HIERARCHY PATTERN </h3>
+
+Kalıtımsal hiyerarşideki tüm entityler için TPH davranışı ile tek bir tablo oluşturulur ve bu tablodaki entity kolonları **DISCRIMINATOR** kolonu ile ayırt edilir.
+
+Discriminator kolonu modelbuilder'da HasDiscriminator ve HasValue fonksiyonları ile özelleştirilebilir. Default olarak tabloda verileri entity isimlerinden alır.
+
+Discriminator özelleştirme;
+```csharp
+modelBuilder.Entity<Employee>()
+    .HasDiscriminator<string>("MyDisc")
+    .HasValue<Person>('P')
+    .HasValue<Employee>('E');
+```
+<br>
+
+EF Core arka planda hangi davranış kullanılıyorsa ona uygun modellemeyi kendisi sağlamaktadır.
+
+Veri ekleme-silme-güncelleme normal şekilde gerçekleştirilir.
+
+Kalıtımsal ilişkiye sahip entity için veri sorgulama yapılıyorsa, üst sınıfa yapılan bir sorgulamada kalıtım verdiği alt sınıf verileride kapsanmaktadır.
