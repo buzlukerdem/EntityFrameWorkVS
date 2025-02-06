@@ -1017,7 +1017,29 @@ modelBuilder.Entity<Employee>()
 
 Kalıtımsal hiyerarşideki tüm entityler için TPH davranışı ile tek bir tablo oluşturulur ve bu tablodaki entity kolonları **DISCRIMINATOR** kolonu ile ayırt edilir.
 
+Kalıtımsal durum;
+```csharp
+public class Person
+{
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public string? Surname { get; set; }
+}
+public class Employee : Person
+{
+    public string? Department { get; set; }
+}
+
+public class Customer : Person
+{
+    public string? Address { get; set; }
+}
+
+```
+<br>
+
 Discriminator kolonu modelbuilder'da HasDiscriminator ve HasValue fonksiyonları ile özelleştirilebilir. Default olarak tabloda verileri entity isimlerinden alır.
+
 
 Discriminator özelleştirme;
 ```csharp
@@ -1033,3 +1055,22 @@ EF Core arka planda hangi davranış kullanılıyorsa ona uygun modellemeyi kend
 Veri ekleme-silme-güncelleme normal şekilde gerçekleştirilir.
 
 Kalıtımsal ilişkiye sahip entity için veri sorgulama yapılıyorsa, üst sınıfa yapılan bir sorgulamada kalıtım verdiği alt sınıf verileride kapsanmaktadır.
+
+<br><br>
+
+<h3>TABLE PER TYPE PATTERN </h3>
+
+Entitylerin aralarında kalıtımsal ilişkiye sahip olduğu durumlarda her bir entity için tablo oluşturulur.
+Bu tablolar arasında 1-1 bir ilişki vardır.
+
+Modelbuilder ile ToTable fonksiyonu kullanılarak TPT davranışı sergilenebilmektedir.
+
+```csharp
+modelBuilder.Entity<Employee>()
+    .ToTable("Employees");
+modelBuilder.Entity<Person>()
+    .ToTable("Persons");
+```
+<br>
+
+TPH ye göre daha yavaşdır.
