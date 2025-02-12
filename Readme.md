@@ -1095,3 +1095,105 @@ Kullanım;
 modelBuilder.Entity<Person>()
     .UseTpcMappingStrategy();
 ```
+
+
+<br><br>
+
+<h3>INDEXES</h3>
+
+Indexleme davranışı, bir veya birden fazla column'a dayalı sorgularda daha fazla verim ve performans sağlar. Indexlenen column'lar Index tablosunda tutulurlar.
+
+**Primary Key - Foreign Key - Alternate Key** default olarak indexlenirler.
+
+<br>
+
+**Indexleme Davranışları**;
+* Index attribute:
+```csharp
+[Index(nameof(Name))]
+class Person
+{
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public string? Surname { get; set; }
+    public int? Age { get; set; }
+}
+```
+<br>
+
+* **Has Index metodu**:
+```csharp
+modelBuilder.Entity<Person>()
+    .HasIndex(p => p.Name);
+```
+<br>
+
+* **Composite Index**:
+```csharp
+[Index(nameof(Name), nameof(Surname))]
+class Person{}
+
+//Fluent Api'da
+modelBuilder.Entity<Person>()
+    .HasIndex(p => new{ p.Name, p.Surname});
+```
+<br>
+
+* **IsUnique** ile unique yapma:
+```csharp
+[Index(nameof(Name), IsUnique = true)]
+class Person{}
+
+//Fluent Api'da
+modelBuilder.Entity<Person>()
+    .HasIndex(p => p.Name)
+    .IsUnique();
+```
+<br>
+
+* **AllDescending**: Tüm indexlemelerde sıralama davranış gösterir. Default Descending'dir. Ascending davranışa göre ayarlanabilir.
+```csharp
+[Index(nameof(Name), AllDescending = false)]
+class Person{}
+```
+<br>
+
+* **IsDescending**: Column'a göre sıralama davranışı gösterir.
+
+```csharp
+[Index(nameof(Name), IsDescending = false)]
+class Person{}
+```
+<br>
+
+* **HasDatabaseName** ile index ismi özelleştirilebilir:
+```csharp
+[Index(nameof(Name), Name = "MyNameIndex")]
+class Person{}
+
+// Fluent Api
+modelBuilder.Entity<Person>()
+    .HasIndex(p => p.Name)
+    .HasDatabaseName("MyNameIndex");
+```
+<br>
+
+* **Filter** uygulama (Null olmayan verilere göre indexleme):
+```csharp
+// Fluent Api
+modelBuilder.Entity<Person>()
+    .HasIndex(p => p.Name)
+    .HasFilter("[NAME] IS NOT NULL");
+```
+<br>
+
+* **Include Properties Method**: Indexlenen column'lar dışında elde edilecek veride başka bir column'unda index tablosuna bildiriminde bulunulabilir.
+```csharp
+// Fluent Api
+modelBuilder.Entity<Person>()
+    .HasIndex(p => new{ p.Name, p.Surname})
+    .IncludeProperties(p => p.Age);
+
+```
+<br>
+
