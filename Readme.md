@@ -1195,5 +1195,76 @@ modelBuilder.Entity<Person>()
     .IncludeProperties(p => p.Age);
 
 ```
+
+<br><br>
+
+<h3>SEQUENCES</h3>
+
+Secuence, veritabanında benzersiz ve ardışık şekilde sayısal değerler üreten bir nesnedir.
+Birden fazla tablo tarafından kullanılabilirdir.
+Veritabanına göre çalışmalar yapmak gerekmektedir.
+Kullanıldığı durumlarda identity kolonu pasifleştirilmiş olur.
+
+Kullanım;
+
+* HasSequence method.
+```csharp
+modelBuilder.HasSequence("MySequence")
+```
+
+* Tablo kolonuna HasDefaultValueSql metodu ile değer verme;
+```csharp
+modelBuilder.Entity<Person>()
+    .Property(p => p.Id)
+    .HasDefaultValueSql("NEXT VALUE FOR MySequence")
+```
+
+* Özelleştirmede bulunulabilir;
+```csharp
+// first 10 - increment 10 - 10 - 10 => 10 - 20 -30
+modelBuilder.HasSequence("MySequence")
+    .StartsAt(10)
+    .IncrementBy(10)
+```
+
 <br>
 
+Identity ile arasındaki fark, sequence bir veritabanı nesnesidir ve değeri diskten değil RAM'den alır. Böylece identity'e göre daha hızlı bir performans gösterebilir.
+
+<br><br>
+
+<h3>LOADING RELATED DATA</h3>
+
+<br>
+
+<h5>EAGER LOADING</h5>
+
+Eager Loading: Sorgulama süreçlerinde sorguya ilişkisel verilerin de eklenmesini iradeli bir şekilde sağlar.
+
+* **Include method**: İlişkisel tabloları sorguya dahil etmeyi sağlar. Aralarındaki navigation property tekil ise bu durum sağlanır.
+
+<br>
+
+* **ThenInclude method**: Include edilen tabloların ilişkili olduğu diğer tablolarda sorgu ekleyebilmek için kullanılır. Navigation property'nin koleksiyonel olması durumunda Include yerine kullanılır.
+
+<br>
+
+* **Filtered Include**: Sorgulama süreçlerinde include edilirken sonuçlar üzerinde filtreleme - sıralama yapabilmeyi sağlar.
+(Where - OrderBy - OrderByDescending - ThenBy - ThenByDescending - Skip - Take fonksiyonlarında kullanılabilmektedir).
+
+<br>
+
+**!** Önceden execute edilmiş/sorgulanmış ve change tracker ile takip edilmiş veriler/belleğe konulmuş veriler var ise filtreleme sonucu veriler bellekten alınır.
+
+<br>
+
+* AutoInclude method: Bu method ile sürekli kullanılacak bir sorguda include edilen bir tablo varsa merkezi bir hale getirmeyi sağlar.
+```csharp
+modelBuilder.Entity<Person>()
+    .Navigation(p => p.Region)
+    .AutoInclude();
+```
+
+<br>
+
+* Kalıtımsal durumlara sahip tablolar üzerinde sorgulamada Include edilecek tablo CAST veya AS operatörü kullanılmalıdır.
