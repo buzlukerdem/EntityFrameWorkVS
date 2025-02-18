@@ -258,7 +258,7 @@ Entity nesnelerinin durumları;
 
 SaveChanges metodu DbcContext sınıfında virtual ile işaretlenmiş ve override edilebilir bir yapıdadır. Override edilerek şartlara göre kullanım amacına göre yapılandırılabilmektedir.
 
-! ChangeTracker ile takip edilen veriler boyutuna göre belirli bir maliyete sebep olabilmektedir.
+!!![] ChangeTracker ile takip edilen veriler boyutuna göre belirli bir maliyete sebep olabilmektedir.
 Elde edilen tüm verilerin takibinin yapılması ve ayrıca veriler sadece listelenmeye tabi tutulacaksa gerekmeye gerekmeyebilmektedir.
 <h4>AsNoTracking</h4>
  AsNoTracking metodu ile maliyet azaltılabilir ve 
@@ -903,7 +903,8 @@ modelBuilder.Entity<Employee>()
 
 * **HasData**
 Migration yapılanmasında veritabanına hazır veriler(**SeedData**) gönderilmesi istenirse HasData method u kullanılabilir.
-! Manuel olarak entity nesnelerinin id değerleri girilmelidir.
+
+!!![] Manuel olarak entity nesnelerinin id değerleri girilmelidir.
 
 ```csharp
 modelBuilder.Entity<Employee>()
@@ -1254,7 +1255,7 @@ Eager Loading: Sorgulama süreçlerinde sorguya ilişkisel verilerin de eklenmes
 
 <br>
 
-**!** Önceden execute edilmiş/sorgulanmış ve change tracker ile takip edilmiş veriler/belleğe konulmuş veriler var ise filtreleme sonucu veriler bellekten alınır.
+!!![] Önceden execute edilmiş/sorgulanmış ve change tracker ile takip edilmiş veriler/belleğe konulmuş veriler var ise filtreleme sonucu veriler bellekten alınır.
 
 <br>
 
@@ -1268,3 +1269,58 @@ modelBuilder.Entity<Person>()
 <br>
 
 * Kalıtımsal durumlara sahip tablolar üzerinde sorgulamada Include edilecek tablo CAST veya AS operatörü kullanılmalıdır.
+
+<br><br>
+
+<h5>EXPLICIT LOADING</h5>
+Oluşturulan sorgularda şarta göre include işlemleri yapmayı sağlar.
+
+* Reference method: Sorguya eklenmek istenilen tablonun navigation propertysinin tekil türde olması gerekir. Tekil ise bu method kullanılarak join işlemi yapılır.
+
+```csharp
+var persons = await context.Persons.ToListAsync();
+
+if(...)
+    await context.Entry(persons).Reference(p => p.Region).LoadAsync();
+```
+
+<br>
+
+* Collection method: Sorguya eklenmek istenilen tablonun navigation propertysinin çoğul türde olması gerekir. Çoğul ise bu method kullanılarak join işlemi yapılır.
+
+```csharp
+var persons = await context.Persons.ToListAsync();
+
+if(...)
+    await context.Entry(persons).Collection(p => p.Orders).LoadAsync();
+```
+
+<br><br>
+
+
+<h5>LAZY LOADING</h5>
+
+Sorguda elde edilen veriler üzerinden ilişkisel verileri kullanmak istenildiğinde sorgu arka planda oluşturularak execute edilir(Lazy Davranış ile).
+
+<br>
+
+**Proxy** yapısı ile Lazy Loading davranışı sergilenebilir.
+
+Kullanmak için: **Microsoft.EntityFrameworkCore.Proxies** kütüphanesi yüklenmelidir.
+Ayrıca optinosBuilder üzerinden **UseLazyLoadingProxies** methodu çağrılmalıdır.
+Kullanılacak entitylerde Navigation Propertyler virtual ile işaretlenmiş olmalıdır.
+
+```csharp
+class Person
+{
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public string? Surname { get; set; }
+    public virtual List<Order> Orders { get; set; }
+    public virtual Region Region { get; set; }
+}
+```
+
+Navigation Propertyler tetiklendikçe sorgu neticesinde veriler belleğe yüklenecektir.
+
+!!![a] LazyLoading kullanırken N+1 problemi yaşanabilmektedir. O yüzden kullanım açısından maliyetli ve performansı düşürücü olabilmektedir. Navigation propertyler döngüsel durumlarda n+1 kadar sorguyu tekrar tetikleyecektir.
